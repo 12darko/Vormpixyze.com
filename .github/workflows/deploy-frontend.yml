@@ -32,6 +32,10 @@ jobs:
         env:
           # Backend lives on the VPS; baked into the build at compile time.
           VITE_API_URL: https://api.vormpixyze.com
+          # Adsterra ad unit keys (set as repo Variables when you have them;
+          # empty = no ads rendered). Settings -> Secrets and variables -> Actions -> Variables.
+          VITE_ADSTERRA_BANNER_KEY: ${{ vars.ADSTERRA_BANNER_KEY }}
+          VITE_ADSTERRA_BANNER_MOBILE_KEY: ${{ vars.ADSTERRA_BANNER_MOBILE_KEY }}
         run: |
           npm ci
           npm run build

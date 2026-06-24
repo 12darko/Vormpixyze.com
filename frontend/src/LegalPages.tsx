@@ -135,7 +135,7 @@ export function LegalPage({ type }: { type: 'privacy' | 'terms' }) {
       <header className="header-panel">
         <a href="/" className="brand-logo" style={{ textDecoration: 'none' }}>
           <div className="brand-icon">V</div>
-          <span className="brand-text">
+          <span className="brand-text" lang="en">
             VormPixyze<span>.io</span>
           </span>
         </a>

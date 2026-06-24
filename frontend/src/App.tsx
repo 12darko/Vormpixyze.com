@@ -3,6 +3,8 @@ import { GameCanvas } from './components/GameCanvas';
 import { Trophy, User as UserIcon, LogOut, ArrowRight, Play, Mouse, Keyboard } from 'lucide-react';
 import { API_BASE } from './config';
 import { LegalPage } from './LegalPages';
+import { useT, LanguageSwitcher } from './i18n';
+import { MenuAd } from './Ads';
 
 interface GlobalLeaderboardEntry {
   userId: string;
@@ -23,9 +25,19 @@ interface Skin {
 
 const SKINS: Skin[] = [
   { id: 'default', name: 'Standard Glitch', rarity: 'Common', color: '#00f0ff', description: 'Standard pixel core mutation.' },
+  { id: 'ember_core', name: 'Ember Core', rarity: 'Common', color: '#ff5e3a', description: 'Molten pixel combustion.' },
+  { id: 'toxic_spore', name: 'Toxic Spore', rarity: 'Common', color: '#ccff00', description: 'Radioactive mutation cloud.' },
   { id: 'crystal_aura', name: 'Crystal Prism', rarity: 'Rare', color: '#bd00ff', description: 'Crystalline structure trails.' },
+  { id: 'frost_byte', name: 'Frost Byte', rarity: 'Rare', color: '#5ad1ff', description: 'Cryogenic data crystals.' },
+  { id: 'golden_glitch', name: 'Golden Glitch', rarity: 'Rare', color: '#ffd700', description: 'Corrupted gold protocol.' },
+  { id: 'plasma_surge', name: 'Plasma Surge', rarity: 'Rare', color: '#ff2e63', description: 'Unstable energy discharge.' },
   { id: 'void_shard', name: 'Void Shard', rarity: 'Epic', color: '#ff007f', description: 'Swirling shadows of the void.' },
-  { id: 'cosmic_nebula', name: 'Cosmic Nebula', rarity: 'Legendary', color: '#39ff14', description: 'Nebula cloud particle system.' }
+  { id: 'neon_viper', name: 'Neon Viper', rarity: 'Epic', color: '#00ffa3', description: 'Venomous neon strain.' },
+  { id: 'ultraviolet', name: 'Ultraviolet', rarity: 'Epic', color: '#7b2ff7', description: 'Beyond-spectrum radiation.' },
+  { id: 'blood_moon', name: 'Blood Moon', rarity: 'Epic', color: '#e01e37', description: 'Eclipse-born infection.' },
+  { id: 'cosmic_nebula', name: 'Cosmic Nebula', rarity: 'Legendary', color: '#39ff14', description: 'Nebula cloud particle system.' },
+  { id: 'solar_flare', name: 'Solar Flare', rarity: 'Legendary', color: '#ff8800', description: 'Stellar plasma eruption.' },
+  { id: 'singularity', name: 'Singularity', rarity: 'Legendary', color: '#aeb8ff', description: 'Collapsed star core.' }
 ];
 
 export default function App() {
@@ -33,6 +45,8 @@ export default function App() {
   const path = window.location.pathname.replace(/\/+$/, '');
   if (path === '/privacy') return <LegalPage type="privacy" />;
   if (path === '/terms') return <LegalPage type="terms" />;
+
+  const { t } = useT();
 
   // Navigation Screens: 'auth' | 'lobby' | 'game' | 'leaderboard'
   const [screen, setScreen] = useState<'auth' | 'lobby' | 'game' | 'leaderboard'>('auth');
@@ -98,7 +112,7 @@ export default function App() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data || typeof data === 'string' ? data : 'Authentication failed.');
+        throw new Error(data || typeof data === 'string' ? data : t('err_auth_failed'));
       }
 
       // Save credentials
@@ -109,7 +123,7 @@ export default function App() {
       setNicknameInput(data.username);
       setScreen('lobby');
     } catch (err: any) {
-      setErrorMsg(err.message || 'Server connection failed.');
+      setErrorMsg(err.message || t('err_conn'));
     }
   };
 
@@ -126,7 +140,7 @@ export default function App() {
       setNicknameInput(data.username);
       setScreen('lobby');
     } catch (err: any) {
-      setErrorMsg('Failed to join as guest. Starting with temporary offline credentials.');
+      setErrorMsg(t('err_guest'));
       setNicknameInput(`Guest_${Math.floor(Math.random() * 9000 + 1000)}`);
       setToken(null);
       setScreen('lobby');
@@ -154,24 +168,29 @@ export default function App() {
           className="brand-logo"
         >
           <div className="brand-icon">V</div>
-          <span className="brand-text">
+          <span className="brand-text" lang="en">
             VormPixyze<span>.io</span>
           </span>
         </div>
 
-        {loggedInUser && screen !== 'game' && (
-          <div className="user-badge-container">
-            <div className="user-badge">
-              <UserIcon size={14} />
-              <span>{loggedInUser}</span>
-            </div>
-            <button 
-              onClick={handleLogout}
-              className="btn-logout"
-              title="Logout"
-            >
-              <LogOut size={16} />
-            </button>
+        {screen !== 'game' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <LanguageSwitcher />
+            {loggedInUser && (
+              <div className="user-badge-container">
+                <div className="user-badge">
+                  <UserIcon size={14} />
+                  <span>{loggedInUser}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="btn-logout"
+                  title="Logout"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </header>
@@ -183,12 +202,10 @@ export default function App() {
         {screen === 'auth' && (
           <div className="glass-panel auth-card">
             <h2 className="card-header-title">
-              {isRegister ? 'Mutate Account' : 'Infect Arena'}
+              {isRegister ? t('auth_register_title') : t('auth_login_title')}
             </h2>
             <p className="card-subtitle">
-              {isRegister 
-                ? 'Create an account to store level rankings and unlock skins.' 
-                : 'Log in to sync your profile evolutions.'}
+              {isRegister ? t('auth_register_sub') : t('auth_login_sub')}
             </p>
 
             {errorMsg && (
@@ -199,7 +216,7 @@ export default function App() {
 
             <form onSubmit={handleAuthSubmit} className="form-form">
               <div className="form-group">
-                <label>Username</label>
+                <label>{t('auth_username')}</label>
                 <input
                   type="text"
                   required
@@ -212,7 +229,7 @@ export default function App() {
 
               {isRegister && (
                 <div className="form-group">
-                  <label>Email Address</label>
+                  <label>{t('auth_email')}</label>
                   <input
                     type="email"
                     required
@@ -225,7 +242,7 @@ export default function App() {
               )}
 
               <div className="form-group">
-                <label>Password</label>
+                <label>{t('auth_password')}</label>
                 <input
                   type="password"
                   required
@@ -237,7 +254,7 @@ export default function App() {
               </div>
 
               <button type="submit" className="btn-neon" style={{ marginTop: '0.5rem' }}>
-                <span>{isRegister ? 'REGISTER CORE' : 'AUTHENTICATE'}</span>
+                <span>{isRegister ? t('auth_register_btn') : t('auth_login_btn')}</span>
                 <ArrowRight size={18} />
               </button>
             </form>
@@ -246,12 +263,12 @@ export default function App() {
               onClick={() => setIsRegister(!isRegister)}
               className="auth-swap-btn"
             >
-              {isRegister ? 'ALREADY INSTALLED? LOG IN' : 'NEW SEED? REGISTER HERE'}
+              {isRegister ? t('auth_swap_to_login') : t('auth_swap_to_register')}
             </button>
 
             <div className="divider-container">
               <div className="divider-line"></div>
-              <span className="divider-text">OR</span>
+              <span className="divider-text">{t('auth_or')}</span>
               <div className="divider-line"></div>
             </div>
 
@@ -260,7 +277,7 @@ export default function App() {
               className="btn-secondary"
             >
               <Play size={16} />
-              <span>PLAY AS GUEST</span>
+              <span>{t('auth_guest')}</span>
             </button>
           </div>
         )}
@@ -274,12 +291,12 @@ export default function App() {
               {/* Left Column: Launcher, Nickname and Visual Controls */}
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.5rem' }}>
                 <div>
-                  <h2 className="lobby-card-title">MUTATION LOBBY</h2>
-                  <p className="lobby-subtitle">Pick a mode, equip skins and configure your nickname payload.</p>
+                  <h2 className="lobby-card-title">{t('lobby_title')}</h2>
+                  <p className="lobby-subtitle">{t('lobby_subtitle')}</p>
                 </div>
 
                 <div className="mode-select">
-                  <span className="section-label">GAME MODE</span>
+                  <span className="section-label">{t('lobby_mode')}</span>
                   <div className="mode-grid">
                     <button
                       type="button"
@@ -287,7 +304,7 @@ export default function App() {
                       className={`mode-card ${selectedMode === 'outbreak' ? 'selected' : ''}`}
                     >
                       <span className="mode-name">OUTBREAK</span>
-                      <span className="mode-desc">Free-for-all · endless</span>
+                      <span className="mode-desc">{t('mode_outbreak_desc')}</span>
                     </button>
                     <button
                       type="button"
@@ -295,14 +312,14 @@ export default function App() {
                       className={`mode-card ${selectedMode === 'blitz' ? 'selected' : ''}`}
                     >
                       <span className="mode-name">BLITZ</span>
-                      <span className="mode-desc">5-min ranked</span>
+                      <span className="mode-desc">{t('mode_blitz_desc')}</span>
                     </button>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div className="form-group">
-                    <label>Nickname</label>
+                    <label>{t('lobby_nickname')}</label>
                     <input
                       type="text"
                       maxLength={15}
@@ -310,7 +327,7 @@ export default function App() {
                       onChange={(e) => setNicknameInput(e.target.value)}
                       className="glass-input"
                       style={{ fontSize: '1.1rem', fontWeight: 600 }}
-                      placeholder="Enter core alias"
+                      placeholder={t('lobby_nickname_ph')}
                     />
                   </div>
 
@@ -320,7 +337,7 @@ export default function App() {
                     className="btn-neon"
                     style={{ padding: '1.2rem', fontSize: '1.1rem' }}
                   >
-                    <span>MUTATE CORE</span>
+                    <span>{t('lobby_play')}</span>
                     <Play size={18} />
                   </button>
                 </div>
@@ -335,23 +352,23 @@ export default function App() {
                     style={{ padding: '0.8rem' }}
                   >
                     <Trophy size={16} style={{ color: '#eab308' }} />
-                    <span>GLOBAL LEADERBOARD</span>
+                    <span>{t('lobby_leaderboard')}</span>
                   </button>
                 </div>
 
                 {/* VISUAL CONTROLS INSTRUCTIONS CARD */}
                 <div className="controls-card">
-                  <div className="controls-card-title">GAME CONTROLS</div>
+                  <div className="controls-card-title">{t('controls_title')}</div>
                   <div className="controls-row-grid">
                     <div className="control-item">
                       <span className="control-icon"><Mouse size={22} /></span>
                       <span className="control-keys">MOUSE</span>
-                      <span className="control-text">Steer by moving your cursor around the screen. (Highly Recommended)</span>
+                      <span className="control-text">{t('controls_mouse')}</span>
                     </div>
                     <div className="control-item">
                       <span className="control-icon"><Keyboard size={22} /></span>
                       <span className="control-keys">WASD / ARROWS</span>
-                      <span className="control-text">Steer pixel seed core orthogonally using keyboard buttons.</span>
+                      <span className="control-text">{t('controls_keys')}</span>
                     </div>
                   </div>
                 </div>
@@ -360,7 +377,7 @@ export default function App() {
 
               {/* Right Column: Skin Selection Grid */}
               <div>
-                <span className="section-label">MUTATION SKINS ({SKINS.length})</span>
+                <span className="section-label">{t('lobby_skins')} ({SKINS.length})</span>
                 
                 <div className="skins-grid">
                   {SKINS.map((skin) => {
@@ -430,7 +447,7 @@ export default function App() {
                 className="btn-secondary"
                 style={{ padding: '0.4rem 1rem', fontSize: '0.75rem', width: 'auto', borderRadius: '20px' }}
               >
-                Quit Game
+                {t('game_quit')}
               </button>
             </div>
           </div>
@@ -442,37 +459,37 @@ export default function App() {
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <div>
-                <h2 className="lobby-card-title">GLOBAL RANKINGS</h2>
-                <p className="lobby-subtitle">All-time champion core mutations.</p>
+                <h2 className="lobby-card-title">{t('lb_title')}</h2>
+                <p className="lobby-subtitle">{t('lb_subtitle')}</p>
               </div>
               <button
                 onClick={() => setScreen('lobby')}
                 className="btn-secondary"
                 style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.8rem' }}
               >
-                BACK TO LOBBY
+                {t('lb_back')}
               </button>
             </div>
 
             {isLoadingScores ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 0', gap: '1rem' }}>
                 <div className="w-16 h-16 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin" style={{ width: '40px', height: '40px', border: '3px solid rgba(0,240,255,0.2)', borderTopColor: '#00f0ff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>PARSING DATABASE INDEXES...</span>
+                <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>{t('lb_loading')}</span>
               </div>
             ) : globalLeaderboard.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '3rem 0', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>
-                No indexed profiles found. Build score records in matches to rank!
+                {t('lb_empty')}
               </div>
             ) : (
               <div className="leaderboard-container">
                 <table className="leaderboard-table">
                   <thead>
                     <tr>
-                      <th>Rank</th>
-                      <th>Core Alias</th>
-                      <th style={{ textAlign: 'center' }}>Level</th>
-                      <th style={{ textAlign: 'right' }}>Captured Tiles</th>
-                      <th style={{ textAlign: 'right' }}>Matches</th>
+                      <th>{t('lb_rank')}</th>
+                      <th>{t('lb_alias')}</th>
+                      <th style={{ textAlign: 'center' }}>{t('lb_level')}</th>
+                      <th style={{ textAlign: 'right' }}>{t('lb_tiles')}</th>
+                      <th style={{ textAlign: 'right' }}>{t('lb_matches')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -504,12 +521,15 @@ export default function App() {
 
       </main>
 
+      {/* Menu-only ad slot (never during gameplay) */}
+      {screen !== 'game' && <MenuAd />}
+
       {/* Footer Panel */}
       <footer className="footer-panel">
         <span>&copy; {new Date().getFullYear()} VormPixyze.io. Powered by ASP.NET Core 9 &amp; SignalR.</span>
         <span className="footer-links">
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
+          <a href="/privacy">{t('footer_privacy')}</a>
+          <a href="/terms">{t('footer_terms')}</a>
         </span>
       </footer>
     </div>
