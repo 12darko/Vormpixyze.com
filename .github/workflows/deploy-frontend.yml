@@ -43,6 +43,6 @@ jobs:
           username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
           password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
           local-dir: ./frontend/dist/
-          # Web root for the main domain. If your FTP account is already jailed
-          # to the web root, change this to ./
-          server-dir: ./public_html/
+          # This Hostinger FTP account lands directly in the web root, so deploy
+          # to ./ (not ./public_html/, which would nest into public_html/public_html/).
+          server-dir: ./
