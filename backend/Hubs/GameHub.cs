@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
@@ -19,6 +20,26 @@ namespace backend.Hubs
             _gameManager = gameManager;
             _serviceProvider = serviceProvider;
         }
+
+        // Signature color per cosmetic skin (kept in sync with the frontend SKINS list).
+        // 'default' is intentionally omitted so default players get a random color,
+        // keeping free-for-all arenas visually varied.
+        private static readonly Dictionary<string, string> SkinColors = new()
+        {
+            ["crystal_aura"]  = "#bd00ff",
+            ["void_shard"]    = "#ff007f",
+            ["cosmic_nebula"] = "#39ff14",
+            ["ember_core"]    = "#ff5e3a",
+            ["toxic_spore"]   = "#ccff00",
+            ["frost_byte"]    = "#5ad1ff",
+            ["golden_glitch"] = "#ffd700",
+            ["plasma_surge"]  = "#ff2e63",
+            ["neon_viper"]    = "#00ffa3",
+            ["ultraviolet"]   = "#7b2ff7",
+            ["blood_moon"]    = "#e01e37",
+            ["solar_flare"]   = "#ff8800",
+            ["singularity"]   = "#aeb8ff",
+        };
 
         public async Task JoinGame(string nickname, string skinId, string mode)
         {
@@ -87,9 +108,18 @@ namespace backend.Hubs
                 }
             }
 
-            // Generate a random bright pastel color
-            string[] colors = { "#FF5733", "#33FF57", "#3357FF", "#F3FF33", "#FF33F3", "#33FFF0", "#FFAF33", "#AF33FF", "#33FFAF", "#FF3361" };
-            string color = colors[new Random().Next(colors.Length)];
+            // Use the selected skin's signature color; fall back to a random bright
+            // color for the default skin / unknown ids (keeps FFA arenas varied).
+            string color;
+            if (!string.IsNullOrEmpty(skinId) && SkinColors.TryGetValue(skinId, out var skinColor))
+            {
+                color = skinColor;
+            }
+            else
+            {
+                string[] colors = { "#FF5733", "#33FF57", "#3357FF", "#F3FF33", "#FF33F3", "#33FFF0", "#FFAF33", "#AF33FF", "#33FFAF", "#FF3361" };
+                color = colors[new Random().Next(colors.Length)];
+            }
 
             // Create player in the room's engine
             var player = engine.AddPlayer(connectionId, userIdString, nickname, color, skinId, startXP, startLevel);

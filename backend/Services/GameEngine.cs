@@ -76,6 +76,12 @@ namespace backend.Services
         public double SlowTimeRemaining { get; set; } = 0;
         public double LastPulseTime { get; set; } = 0;
         public int AnnouncedLevel { get; set; } = 1;
+
+        // --- Bot AI personality (bots only; harmless defaults for humans) ---
+        public double BotAggression { get; set; } = 0.5;  // 0..1: how readily it ventures out / hunts
+        public int BotExpandTarget { get; set; } = 8;      // trail length it tries to reach before returning
+        public int BotWanderChance { get; set; } = 10;     // % chance to change direction while wandering
+        public int BotDetectRange { get; set; } = 10;      // range (cells) to spot enemy trails to sever
     }
 
     public class LeaderboardEntry
@@ -1113,16 +1119,45 @@ namespace backend.Services
             };
         }
 
+        // Pool of believable .io-style handles so newcomers read the arena as full
+        // of real players, not bots. Mixed international + Turkish, varied styles.
+        private static readonly string[] BotNamePool = {
+            "Shadow", "Venom", "Drift", "Reaper", "Phoenix", "Frost", "Nova", "Blaze",
+            "Echo", "Ghost", "Storm", "Pulse", "Rogue", "Titan", "Hexx", "Vortex",
+            "Riptide", "Cyra", "Neo", "Wraith", "Kaan", "Mert", "Efe", "Zeyd",
+            "Demir", "Berkay", "Onur", "Yigit", "Selin", "Deniz", "Lucaz", "Mia",
+            "Luna", "Aria", "Skylar", "Misha", "Jax", "Zara", "Kylee", "Dash",
+            "Toxic", "Sniperr", "proGamer", "noobmaster", "Slayerr", "iceyy", "Voltz",
+            "kuzgun", "Krypt", "Nyx"
+        };
+
+        // Skin/color pairs bots draw from, so each looks visually distinct.
+        private static readonly (string skin, string color)[] BotSkinPool = {
+            ("ember_core", "#ff5e3a"), ("toxic_spore", "#ccff00"), ("frost_byte", "#5ad1ff"),
+            ("golden_glitch", "#ffd700"), ("plasma_surge", "#ff2e63"), ("neon_viper", "#00ffa3"),
+            ("ultraviolet", "#7b2ff7"), ("blood_moon", "#e01e37"), ("crystal_aura", "#bd00ff"),
+            ("cosmic_nebula", "#39ff14"), ("void_shard", "#ff007f"), ("solar_flare", "#ff8800")
+        };
+
         private void InitializeBots()
         {
-            string[] botNames = { "PixelBot_Alpha", "Mutator_Core", "Infector_Void", "Glitch_Entity", "Cosmic_Infect" };
-            string[] botColors = { "#FF5733", "#39ff14", "#bd00ff", "#00f0ff", "#ff007f" };
-            string[] skins = { "default", "crystal_aura", "void_shard", "cosmic_nebula", "default" };
+            var names = BotNamePool.OrderBy(_ => _random.Next()).Take(5).ToList();
+            var skins = BotSkinPool.OrderBy(_ => _random.Next()).Take(5).ToList();
 
-            for (int i = 0; i < botNames.Length; i++)
+            for (int i = 0; i < names.Count; i++)
             {
+                string display = names[i];
+                // ~45% of handles carry a number suffix, like real players ("Kaan34").
+                if (_random.Next(100) < 45) display += _random.Next(2, 99).ToString();
+
                 string botId = $"bot_{i + 1}";
-                AddPlayer(botId, botId, botNames[i], botColors[i], skins[i], 0, 1);
+                var bot = AddPlayer(botId, botId, display, skins[i].color, skins[i].skin, 0, 1);
+
+                // Give each bot its own "personality": cautious campers vs aggressive expanders.
+                bot.BotAggression = 0.35 + _random.NextDouble() * 0.6;  // 0.35 .. 0.95
+                bot.BotExpandTarget = _random.Next(6, 16);              // how much land it grabs per run
+                bot.BotWanderChance = _random.Next(6, 15);
+                bot.BotDetectRange = _random.Next(8, 16);
             }
         }
 
@@ -1151,7 +1186,7 @@ namespace backend.Services
                 int ty = gridY + (int)bot.DirY;
                 bool hasTarget = false;
 
-                int maxTrail = 3 + bot.Level;
+                int maxTrail = bot.BotExpandTarget + bot.Level;
 
                 // Behavior 1: Force return home if trail is too long
                 if (!isInside && bot.Trail.Count >= maxTrail)
@@ -1180,7 +1215,7 @@ namespace backend.Services
                 if (!hasTarget)
                 {
                     TrailPoint? targetPoint = null;
-                    double closestDist = 12.0; // max detection range (12 grid cells)
+                    double closestDist = bot.BotDetectRange; // personality-driven hunt range
 
                     foreach (var otherPlayer in _players.Values)
                     {
@@ -1206,19 +1241,32 @@ namespace backend.Services
                     }
                 }
 
-                // Behavior 3: Wander inside territory or if no active target
+                // Behavior 3: Expand territory deliberately, otherwise wander.
                 if (!hasTarget)
                 {
-                    // 12% chance to change direction to wander
-                    if (_random.Next(100) < 12)
+                    // Sitting inside our own land: venture outward to claim new territory,
+                    // like a real player grinding area (gated by the bot's aggression).
+                    if (isInside && bot.Trail.Count == 0)
+                    {
+                        var outward = OutwardDirection(bot, gridX, gridY, safeDirs);
+                        if (outward.HasValue)
+                        {
+                            bot.DirX = outward.Value.x;
+                            bot.DirY = outward.Value.y;
+                            return;
+                        }
+                    }
+
+                    // Occasional random turn so movement doesn't look robotic.
+                    if (_random.Next(100) < bot.BotWanderChance)
                     {
                         var randomSafeDir = safeDirs[_random.Next(safeDirs.Count)];
                         bot.DirX = randomSafeDir.x;
                         bot.DirY = randomSafeDir.y;
                         return;
                     }
-                    
-                    // Otherwise, default to continuing in current direction if it is safe
+
+                    // Otherwise keep going straight if that's still safe.
                     bool currentDirIsSafe = safeDirs.Any(d => d.x == (int)bot.DirX && d.y == (int)bot.DirY);
                     if (currentDirIsSafe)
                     {
@@ -1282,6 +1330,27 @@ namespace backend.Services
                         continue;
                 }
 
+                // 4. When vulnerable (carrying a trail), don't step right next to an
+                //    enemy head — that's how you get cut. Avoid the suicidal move.
+                if (bot.Trail.Count > 0)
+                {
+                    bool nextToEnemy = false;
+                    foreach (var other in _players.Values)
+                    {
+                        if (other.ConnectionId == bot.ConnectionId || other.IsDead)
+                            continue;
+                        int ox = (int)Math.Round(other.X);
+                        int oy = (int)Math.Round(other.Y);
+                        if (Math.Abs(ox - nx) + Math.Abs(oy - ny) <= 1)
+                        {
+                            nextToEnemy = true;
+                            break;
+                        }
+                    }
+                    if (nextToEnemy)
+                        continue;
+                }
+
                 list.Add(dir);
             }
 
@@ -1293,6 +1362,35 @@ namespace backend.Services
             int dirIndex = _random.Next(4);
             player.DirX = dirIndex switch { 0 => 1, 1 => -1, _ => 0 };
             player.DirY = dirIndex switch { 2 => 1, 3 => -1, _ => 0 };
+        }
+
+        // Picks a safe direction heading away from the bot's own territory, so it
+        // ventures toward unclaimed land. Returns null for cautious bots (they stay in).
+        private (int x, int y)? OutwardDirection(PlayerState bot, int gridX, int gridY, List<(int x, int y)> safeDirs)
+        {
+            if (safeDirs.Count == 0) return null;
+            // Low-aggression bots venture out less often (camp their land).
+            if (_random.NextDouble() > bot.BotAggression) return null;
+
+            if (bot.CapturedTiles.Count == 0)
+                return safeDirs[_random.Next(safeDirs.Count)];
+
+            double cx = 0, cy = 0;
+            foreach (var t in bot.CapturedTiles) { cx += t.x; cy += t.y; }
+            cx /= bot.CapturedTiles.Count;
+            cy /= bot.CapturedTiles.Count;
+
+            (int x, int y)? best = null;
+            double bestScore = double.MinValue;
+            foreach (var d in safeDirs)
+            {
+                double nx = gridX + d.x;
+                double ny = gridY + d.y;
+                // Farther from our territory centroid = more outward = claims new land.
+                double score = (nx - cx) * (nx - cx) + (ny - cy) * (ny - cy);
+                if (score > bestScore) { bestScore = score; best = d; }
+            }
+            return best;
         }
     }
 }
