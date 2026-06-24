@@ -710,6 +710,15 @@ body {
   color: rgba(255, 255, 255, 0.22);
 }
 
+/* In-game "Quit" button anchor (positioned via CSS so mobile can move it). */
+.quit-hook {
+  position: absolute;
+  top: 1.25rem;
+  left: 21rem;
+  pointer-events: auto;
+  z-index: 30;
+}
+
 
 /* ==========================================
    IN-GAME HUD & OVERLAYS
@@ -1426,4 +1435,66 @@ body {
   font-family: var(--font-mono);
   color: var(--text-mid);
   font-size: 0.9rem;
+}
+
+/* ====================================================================== */
+/* Mobile: shrink the in-game HUD so it doesn't cover the play area.       */
+/* Placed at end of file so it overrides the base HUD rules above.         */
+/* ====================================================================== */
+@media (max-width: 640px) {
+  .ingame-hud-left {
+    top: 0.45rem;
+    left: 0.45rem;
+    width: 144px;
+    padding: 0.5rem 0.55rem;
+    border-radius: 12px;
+  }
+  .ingame-hud-left .hud-username {
+    font-size: 0.78rem;
+    max-width: 92px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ingame-hud-left .hud-evo { font-size: 0.5rem; margin-bottom: 0.2rem; }
+  .ingame-hud-left .hud-level-badge { font-size: 0.5rem; padding: 0.08rem 0.35rem; }
+  .ingame-hud-left .hud-xp-bar-container { height: 6px; margin-top: 0.35rem; }
+  .ingame-hud-left .hud-xp-text-row { font-size: 0.52rem; margin-top: 0.15rem; }
+  .ingame-hud-left .hud-chips { margin-top: 0.5rem; padding-top: 0.5rem; gap: 0.3rem; }
+  .ingame-hud-left .hud-chip { flex-direction: column; gap: 0.15rem; padding: 0.3rem 0.2rem; text-align: center; }
+  .ingame-hud-left .hud-chip-val { font-size: 0.72rem; }
+  .ingame-hud-left .hud-chip-val small { font-size: 0.42rem; }
+  /* Free vertical space: drop the non-essential hints on phones. */
+  .ingame-hud-left .hud-next-unlock,
+  .ingame-hud-left .hud-tab-tip { display: none; }
+
+  .ingame-hud-right {
+    top: 0.45rem;
+    right: 0.45rem;
+    width: 116px;
+    padding: 0.4rem 0.45rem;
+    border-radius: 12px;
+  }
+  .ingame-hud-right .hud-leaderboard-title { font-size: 0.5rem; gap: 0.3rem; margin-bottom: 0.3rem; }
+  .ingame-hud-right .hud-leaderboard-row { font-size: 0.58rem; padding: 0.12rem 0.2rem; }
+  .ingame-hud-right .hud-leaderboard-name {
+    max-width: 58px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ingame-hud-right .hud-leaderboard-score { font-size: 0.58rem; }
+  /* Only the top 5 fit comfortably on a phone. */
+  .ingame-hud-right .hud-leaderboard-list .hud-leaderboard-row:nth-child(n+6) { display: none; }
+
+  /* Quit button: out of the corners (panels live there now) -> top center, small. */
+  .quit-hook {
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .quit-hook .btn-secondary {
+    padding: 0.28rem 0.7rem !important;
+    font-size: 0.6rem !important;
+  }
 }

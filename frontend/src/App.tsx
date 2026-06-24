@@ -450,7 +450,7 @@ export default function App() {
             />
 
             {/* Back to lobby hook */}
-            <div style={{ position: 'absolute', top: '1.25rem', left: '21rem', pointerEvents: 'auto', zIndex: 30 }}>
+            <div className="quit-hook">
               <button
                 onClick={() => setScreen('lobby')}
                 className="btn-secondary"
