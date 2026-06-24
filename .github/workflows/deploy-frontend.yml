@@ -1,0 +1,48 @@
+name: Deploy frontend to Hostinger
+
+# Builds the Vite app and uploads the static output (frontend/dist) to the
+# Hostinger web host via FTP on every push that touches the frontend.
+# Requires three repo secrets (Settings -> Secrets and variables -> Actions):
+#   HOSTINGER_FTP_SERVER    e.g. ftp.vormpixyze.com  (or the host IP)
+#   HOSTINGER_FTP_USERNAME  the FTP account user (hPanel -> Files -> FTP Accounts)
+#   HOSTINGER_FTP_PASSWORD  that FTP account's password
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install & build
+        working-directory: frontend
+        env:
+          # Backend lives on the VPS; baked into the build at compile time.
+          VITE_API_URL: https://api.vormpixyze.com
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          local-dir: ./frontend/dist/
+          # Web root for the main domain. If your FTP account is already jailed
+          # to the web root, change this to ./
+          server-dir: ./public_html/
