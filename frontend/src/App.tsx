@@ -77,6 +77,15 @@ export default function App() {
     }
   }, [token, loggedInUser]);
 
+  // Show the static SEO landing content (and allow scrolling) on menu screens;
+  // lock the viewport and hide it during gameplay.
+  useEffect(() => {
+    const landing = document.getElementById('landing-seo');
+    const inGame = screen === 'game';
+    document.body.style.overflowY = inGame ? 'hidden' : 'auto';
+    if (landing) landing.style.display = inGame ? 'none' : 'block';
+  }, [screen]);
+
   // Fetch Global high scores
   const fetchGlobalLeaderboard = async () => {
     setIsLoadingScores(true);

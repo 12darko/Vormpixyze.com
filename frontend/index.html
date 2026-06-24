@@ -5,11 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="VormPixyze.io — free real-time multiplayer .io game. Conquer territory, evolve to unlock powers, and fortify your land. Play instantly in your browser, no download." />
-    <meta name="keywords" content="vormpixyze, io game, territory game, paper.io, splix.io, multiplayer io, browser game, free online game, snake io, conquer game" />
+    <meta name="description" content="Play VormPixyze.io free — a real-time multiplayer .io territory game. Conquer the grid, evolve to unlock powers, and fortify your land. No download, plays in your browser." />
+    <meta name="keywords" content="vormpixyze, io game, territory game, paper.io, splix.io, multiplayer io game, browser game, free online game, conquer game, .io games" />
     <meta name="theme-color" content="#0a0a14" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <link rel="canonical" href="https://vormpixyze.com/" />
+
+    <!-- Language alternates (hreflang) -->
+    <link rel="alternate" hreflang="x-default" href="https://vormpixyze.com/" />
+    <link rel="alternate" hreflang="en" href="https://vormpixyze.com/" />
+    <link rel="alternate" hreflang="tr" href="https://vormpixyze.com/?lang=tr" />
+    <link rel="alternate" hreflang="es" href="https://vormpixyze.com/?lang=es" />
+    <link rel="alternate" hreflang="pt" href="https://vormpixyze.com/?lang=pt" />
+    <link rel="alternate" hreflang="de" href="https://vormpixyze.com/?lang=de" />
+    <link rel="alternate" hreflang="fr" href="https://vormpixyze.com/?lang=fr" />
+    <link rel="alternate" hreflang="ru" href="https://vormpixyze.com/?lang=ru" />
 
     <!-- Open Graph / social share -->
     <meta property="og:type" content="website" />
@@ -50,18 +60,114 @@
       "operatingSystem": "Web Browser",
       "browserRequirements": "Requires JavaScript and HTML5 Canvas",
       "inLanguage": ["en", "tr", "es", "pt", "de", "fr", "ru"],
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
     </script>
 
-    <title>VormPixyze.io | Paint. Mutate. Conquer. — Free Multiplayer .io Game</title>
+    <!-- Structured data: FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What is VormPixyze.io?",
+          "acceptedAnswer": { "@type": "Answer", "text": "VormPixyze.io is a free real-time multiplayer .io game where you conquer territory on a shared grid, evolve your pixel core to unlock powers, and fortify the land you capture. It plays instantly in your browser." } },
+        { "@type": "Question", "name": "Is VormPixyze.io free to play?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. VormPixyze.io is completely free and requires no download or installation. Just open the page and play." } },
+        { "@type": "Question", "name": "How do you play VormPixyze.io?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Steer your core with the mouse or WASD/arrow keys. Leave your territory to draw a trail, then return to your land to enclose and capture the area inside. Cut other players' trails to eliminate them." } },
+        { "@type": "Question", "name": "What game modes are there?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Outbreak is an endless free-for-all you can drop into anytime. Blitz is a 5-minute ranked match where the player with the most territory wins." } },
+        { "@type": "Question", "name": "Can I play VormPixyze.io on mobile?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. VormPixyze.io works on mobile browsers with an on-screen touch joystick, as well as on desktop." } }
+      ]
+    }
+    </script>
+
+    <title>VormPixyze.io | Free Multiplayer .io Territory Game — Paint. Mutate. Conquer.</title>
+
+    <!-- Critical CSS for the static landing content (crawlable without JS) -->
+    <style>
+      #landing-seo { color: #c7ccea; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; max-width: 860px; margin: 0 auto; padding: 3rem 1.25rem 5rem; line-height: 1.7; }
+      #landing-seo h1, #landing-seo h2 { color: #e8ecff; line-height: 1.25; }
+      #landing-seo h1 { font-size: 1.9rem; margin: 0 0 0.75rem; }
+      #landing-seo h2 { font-size: 1.25rem; margin: 2rem 0 0.5rem; }
+      #landing-seo a { color: #00f0ff; }
+      #landing-seo .lead { color: #aab0d6; font-size: 1.05rem; }
+      #landing-seo ul { padding-left: 1.2rem; }
+      #landing-seo li { margin: 0.35rem 0; }
+      #landing-seo .seo-faq dt { color: #e8ecff; font-weight: 600; margin-top: 1rem; }
+      #landing-seo .seo-cta { display: inline-block; margin-top: 1.5rem; padding: 0.7rem 1.4rem; border-radius: 10px; background: linear-gradient(135deg, #00f0ff, #bd00ff); color: #04040a; font-weight: 700; text-decoration: none; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Static, crawlable landing content. Visible below the game on menu screens;
+         hidden during gameplay. Gives search engines real text to index. -->
+    <section id="landing-seo">
+      <h1>VormPixyze.io — Free Multiplayer .io Territory Game</h1>
+      <p class="lead">
+        VormPixyze.io is a fast, free, real-time <strong>.io territory game</strong> you play right in your
+        browser. Conquer the grid, <strong>evolve</strong> your pixel core to unlock real powers, and
+        <strong>fortify</strong> the land you capture. No download, no sign-up required — just jump in and play.
+      </p>
+      <a class="seo-cta" href="/">▶ Play VormPixyze.io Free</a>
+
+      <h2>What is VormPixyze.io?</h2>
+      <p>
+        Inspired by classics like Paper.io and Splix.io, VormPixyze.io turns territory capture into something
+        deeper. Every area you claim feeds your evolution — from a tiny Pixel Seed all the way to a Cosmic
+        Infection — and each tier unlocks a power that changes how you play. It's a paint-the-map game crossed
+        with light strategy and persistent progression.
+      </p>
+
+      <h2>How to Play</h2>
+      <ul>
+        <li><strong>Steer</strong> your core with your mouse, or use WASD / arrow keys.</li>
+        <li><strong>Leave your territory</strong> to draw a trail across the grid.</li>
+        <li><strong>Return to your land</strong> to enclose the loop and capture everything inside.</li>
+        <li><strong>Cut rivals' trails</strong> before they get home to eliminate them and grow faster.</li>
+        <li>Collect crystals, raise shields, boost, and build Sentries and Pylons to defend your turf.</li>
+      </ul>
+
+      <h2>Game Modes</h2>
+      <ul>
+        <li><strong>Outbreak</strong> — an endless free-for-all you can drop into any time.</li>
+        <li><strong>Blitz</strong> — a 5-minute ranked match; the player holding the most territory wins.</li>
+      </ul>
+
+      <h2>Evolve &amp; Fortify</h2>
+      <p>
+        Climb the evolution ladder — Pixel Seed, Crystal Core, Energy Entity, Void Creature, Cosmic Infection —
+        and unlock shields, speed boosts, cheaper structures, and an area-effect mutation pulse. Your XP and
+        unlocks are saved across sessions, so every match makes you stronger.
+      </p>
+
+      <h2>Why Play VormPixyze.io?</h2>
+      <ul>
+        <li>100% free and instant — runs in any modern browser, on desktop and mobile.</li>
+        <li>Real-time multiplayer with a global leaderboard.</li>
+        <li>Available in English, Türkçe, Español, Português, Deutsch, Français and Русский.</li>
+      </ul>
+
+      <h2>Frequently Asked Questions</h2>
+      <dl class="seo-faq">
+        <dt>Is VormPixyze.io free?</dt>
+        <dd>Yes — it's completely free with no download or installation.</dd>
+        <dt>Do I need to install anything?</dt>
+        <dd>No. VormPixyze.io plays directly in your web browser.</dd>
+        <dt>Can I play on mobile?</dt>
+        <dd>Yes, with an on-screen touch joystick on phones and tablets.</dd>
+        <dt>How do I capture territory?</dt>
+        <dd>Leave your area to draw a trail, then return to your land to enclose and claim everything inside.</dd>
+      </dl>
+
+      <p style="margin-top:2rem">
+        <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms">Terms of Service</a>
+      </p>
+    </section>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

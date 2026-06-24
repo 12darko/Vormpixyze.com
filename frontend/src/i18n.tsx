@@ -334,9 +334,14 @@ const translations: Record<LangCode, Dict> = { en, tr, es, pt, de, fr, ru };
 
 function detectLang(): LangCode {
   try {
+    // 1) Explicit ?lang= URL param (used by hreflang alternates for SEO).
+    const urlLang = new URLSearchParams(window.location.search).get('lang') as LangCode | null;
+    if (urlLang && translations[urlLang]) return urlLang;
+    // 2) Previously chosen language.
     const saved = localStorage.getItem('lang') as LangCode | null;
     if (saved && translations[saved]) return saved;
   } catch { /* ignore */ }
+  // 3) System / browser language.
   const nav = (navigator.language || 'en').slice(0, 2).toLowerCase() as LangCode;
   return translations[nav] ? nav : 'en';
 }
