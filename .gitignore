@@ -1,0 +1,50 @@
+# ---- Build output ----
+backend/bin/
+backend/obj/
+frontend/dist/
+frontend/node_modules/
+node_modules/
+
+# ---- Databases (contain user data — never commit; prod uses volume/Postgres) ----
+*.db
+*.db-shm
+*.db-wal
+
+# ---- Local env files (keep .env.example) ----
+.env
+.env.*
+!.env.example
+
+# ---- Python (local tooling / venv) ----
+.venv/
+__pycache__/
+*.pyc
+
+# ---- IDE / OS ----
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.user
+*.suo
+
+# ---- AI assistant tool folders (local config, not project source) ----
+.agent/
+.codebuddy/
+.codex/
+.continue/
+.cursor/
+.fallow/
+.gemini/
+.github/prompts/
+.kiro/
+.opencode/
+.qoder/
+.roo/
+.trae/
+.windsurf/
+
+# .claude: ignore everything except the shared launch config
+.claude/*
+!.claude/launch.json
